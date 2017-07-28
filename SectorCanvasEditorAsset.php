@@ -1,6 +1,6 @@
 <?php
 
-namespace andrewljashenko\sectorcanvaseditor;
+namespace andriiliashenko\sectorcanvaseditor;
 
 use yii\web\AssetBundle;
 
