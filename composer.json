@@ -4,6 +4,7 @@
     "type": "yii2-extension",
     "keywords": ["yii2","extension","sector","canvas","fabricjs"],
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Andrii Liashenko",
