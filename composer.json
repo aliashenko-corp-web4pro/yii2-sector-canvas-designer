@@ -1,0 +1,21 @@
+{
+    "name": "andrewljashenko/yii2-sector-canvas-designer",
+    "description": "The extension allow user to create a sector with seats and save it using InputWidget field.",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","sector","canvas","fabricjs"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrii Liashenko",
+            "email": "andrewljashenko@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "andrewljashenko\\sectorcanvaseditor\\": ""
+        }
+    }
+}
