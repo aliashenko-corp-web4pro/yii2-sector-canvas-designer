@@ -4,7 +4,7 @@
  * @var SectorCanvasForm $model
  */
 
-use andriiliashenko\sectorcanvaseditor\SectorCanvasForm; ?>
+use andrewljashenko\sectorcanvaseditor\SectorCanvasForm; ?>
 
 <div class="row">
     <div class="col-md-12">

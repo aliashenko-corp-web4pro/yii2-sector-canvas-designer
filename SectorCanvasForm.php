@@ -1,12 +1,12 @@
 <?php
 
-namespace andriiliashenko\sectorcanvaseditor;
+namespace andrewljashenko\sectorcanvaseditor;
 
 use yii\base\Model;
 
 /**
  * Class SectorCanvasForm
- * @package andriiliashenko\sectorcanvaseditor
+ * @package andrewljashenko\sectorcanvaseditor
  */
 class SectorCanvasForm extends Model
 {

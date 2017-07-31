@@ -1,6 +1,6 @@
 <?php
 
-namespace andriiliashenko\sectorcanvaseditor;
+namespace andrewljashenko\sectorcanvaseditor;
 
 use Yii;
 use yii\helpers\Html;

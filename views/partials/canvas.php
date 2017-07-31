@@ -5,7 +5,7 @@
  */
 
 use yii\bootstrap\ActiveForm;
-use andriiliashenko\sectorcanvaseditor\SectorCanvasForm; ?>
+use andrewljashenko\sectorcanvaseditor\SectorCanvasForm; ?>
 
 <?php $form = new ActiveForm(); ?>
 
