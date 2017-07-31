@@ -11,7 +11,6 @@
      */
     function SectorCanvasEditor(canvasElement, config) {
         this.canvas = canvasElement;
-        this.fabricCanvas = new fabric.Canvas(this.canvas);
 
         config = typeof config === 'object' ? config : {};
 
@@ -25,12 +24,17 @@
             seatHeight: 30,
             seatDefaultColor: '#02c103',
             seatMarginTop: 5,
-            seatMarginLeft: 5
+            seatMarginLeft: 5,
+            fontSize: 14,
+            fontFamily: 'Helvetica',
+            fontColor: '#000'
         };
 
         this.hallSeats = [];
 
         this.config = Object.assign(this.defaultConfig, config);
+
+        this.fabricCanvas = new fabric.Canvas(this.canvas, {width: this.config.canvasWidth, height: this.config.canvasHeight});
     }
 
     /**
@@ -39,7 +43,17 @@
      * @param config
      */
     SectorCanvasEditor.prototype.addSeat = function(config) {
-        this.hallSeats[config.row][config.col] = config;
+        this.hallSeats[config.row].push(config);
+    };
+
+    SectorCanvasEditor.prototype.setCanvasWidth = function(width) {
+        this.fabricCanvas.setWidth(width);
+        this.renderAll();
+    };
+
+    SectorCanvasEditor.prototype.setCanvasHeight = function(height) {
+        this.fabricCanvas.setHeight(height);
+        this.renderAll();
     };
 
     /**
@@ -49,20 +63,24 @@
      * @param seatColor
      */
     SectorCanvasEditor.prototype.addRow = function(numberOfSeats, seatColor) {
-        var seatPositionY = this.hallSeats.length  * (this.seatHeight + this.seatMarginTop);
+        var length = this.hallSeats.length;
+        var seatPositionY = this.hallSeats.length  * (this.config.seatHeight + this.config.seatMarginTop);
+
         this.hallSeats[this.hallSeats.length] = [];
-        var seats = [];
 
         for (var i = 0; i < numberOfSeats; i++) {
-            var seatPositionX = i * (this.seatWidth + this.seatMarginLeft);
+            var seatPositionX = i * (this.config.seatWidth + this.config.seatMarginLeft);
             this.addSeat({
                 x: seatPositionX,
                 y: seatPositionY,
                 color: typeof seatColor === 'undefined' ? this.config.seatDefaultColor : seatColor,
-                row: this.hallSeats.length,
-                col: i
+                row: length,
+                col: i,
+                index: this.config.numberSeatsFrom++
             });
         }
+
+        this.renderAll();
     };
 
     /**
@@ -75,19 +93,35 @@
             this.fabricCanvas.clear();
 
             for (var x in this.hallSeats) {
-                var offsetLeft = this._calcRowCenter(x);
+                var offsetLeft = this._calcRowCenter(x).left;
 
                 for (var y in this.hallSeats[x]) {
-                    if (typeof this.hallSeats[x][y] !== 'undefined') {
+                    if (typeof this.hallSeats[x][y].index !== 'undefined') {
                         var seatConfig = this.hallSeats[x][y];
 
                         var seat = new fabric.Rect({
                             width: this.config.seatWidth,
                             height: this.config.seatHeight,
-                            left: seatConfig.seatPositionX,
-                            top: seatConfig.seatPositionY,
-                            fill: seatConfig.color
+                            fill: seatConfig.color,
+                            originX: 'center',
+                            originY: 'center'
                         });
+
+                        var t1 = new fabric.Text(String(seatConfig.index), {
+                            fill: this.config.fontColor,
+                            fontFamily: this.config.fontFamily,
+                            textAlign: 'center',
+                            fontSize: this.config.fontSize,
+                            originX: 'center',
+                            originY: 'center'
+                        });
+
+                        var group = new fabric.Group([seat, t1], {
+                            left: seatConfig.x + offsetLeft,
+                            top: seatConfig.y
+                        });
+
+                        this.fabricCanvas.add(group);
                     }
                 }
             }
@@ -102,7 +136,7 @@
      */
     SectorCanvasEditor.prototype._calcRowCenter = function(row) {
         return {
-            left: (this.canvasWidth - (this.hallSeats[row].length * (this.seatWidth + this.seatMarginLeft))) / 2
+            left: (this.config.canvasWidth - (this.hallSeats[row].length * (this.config.seatWidth + this.config.seatMarginLeft))) / 2
         };
     };
 
