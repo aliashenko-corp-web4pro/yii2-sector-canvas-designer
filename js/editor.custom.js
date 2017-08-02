@@ -34,7 +34,11 @@
 
         this.config = Object.assign(this.defaultConfig, config);
 
-        this.fabricCanvas = new fabric.Canvas(this.canvas, {width: this.config.canvasWidth, height: this.config.canvasHeight});
+        this.fabricCanvas = new fabric.Canvas(this.canvas, {
+            width: this.config.canvasWidth,
+            height: this.config.canvasHeight,
+            backgroundColor: this.config.canvasBackgroundColor
+        });
     }
 
     /**

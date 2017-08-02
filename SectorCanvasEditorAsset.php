@@ -13,15 +13,16 @@ class SectorCanvasEditorAsset extends AssetBundle
     /**
      * @var string
      */
-    public $sourcePath = '@andrewljashenko/yii2-sector-canvas-designer';
+    public $sourcePath = '@vendor/andrewljashenko/yii2-sector-canvas-designer';
 
     /**
      * @var array
      */
     public $js = [
-        '/js/fabric.min.js',
-        '/js/editor.custom.js',
-        '/js/editor.ui.js',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+        'js/fabric.min.js',
+        'js/editor.custom.js',
+        'js/editor.ui.js',
     ];
 
     /**

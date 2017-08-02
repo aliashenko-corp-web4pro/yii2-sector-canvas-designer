@@ -65,6 +65,7 @@ class SectorCanvasEditor extends InputWidget
     {
         return [
             'canvas' => Yii::t('app', 'Canvas Settings'),
+            'seats' => Yii::t('app', 'Manage seats'),
         ];
     }
 

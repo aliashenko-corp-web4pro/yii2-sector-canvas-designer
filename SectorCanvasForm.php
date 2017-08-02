@@ -21,7 +21,7 @@ class SectorCanvasForm extends Model
     /**
      * @var string
      */
-    public $canvasBackgroundColor = '#fff';
+    public $canvasBackgroundColor = '#ffffff';
     /**
      * @var int
      */
@@ -50,6 +50,10 @@ class SectorCanvasForm extends Model
      * @var string
      */
     public $fontColor = '#000';
+    /**
+     * @var
+     */
+    public $numFieldPerRow = 5;
 
     /**
      * @return array
