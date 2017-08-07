@@ -53,7 +53,7 @@ class SectorCanvasForm extends Model
     /**
      * @var
      */
-    public $numFieldPerRow = 5;
+    public $numSeatsPerRow = 5;
 
     /**
      * @return array

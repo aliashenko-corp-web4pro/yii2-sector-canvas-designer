@@ -52,11 +52,19 @@
 
     SectorCanvasEditor.prototype.setCanvasWidth = function(width) {
         this.fabricCanvas.setWidth(width);
+        this.config.canvasWidth = width;
         this.renderAll();
     };
 
     SectorCanvasEditor.prototype.setCanvasHeight = function(height) {
         this.fabricCanvas.setHeight(height);
+        this.config.canvasHeight = height;
+        this.renderAll();
+    };
+
+    SectorCanvasEditor.prototype.setCanvasBackgroundColor = function(color) {
+        this.fabricCanvas.setBackgroundColor(color);
+        this.config.canvasBackgroundColor = color;
         this.renderAll();
     };
 
@@ -94,7 +102,10 @@
      */
     SectorCanvasEditor.prototype.renderAll = function() {
         if (this.hallSeats.length) {
-            this.fabricCanvas.clear();
+            var objects = this.fabricCanvas.getObjects();
+            for (var i in objects) {
+                this.fabricCanvas.remove(objects[i]);
+            }
 
             for (var x in this.hallSeats) {
                 var offsetLeft = this._calcRowCenter(x).left;

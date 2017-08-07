@@ -13,7 +13,7 @@ use yii\widgets\InputWidget;
  */
 class SectorCanvasEditor extends InputWidget
 {
-    public $template = '<div class="row">
+    public $template = '<div class="row sector-canvas-wrap">
                             <div class="col-md-7">{canvas}</div>
                             <div class="col-md-5">{ui}</div>
                         </div>';
