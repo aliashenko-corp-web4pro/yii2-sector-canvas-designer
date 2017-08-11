@@ -31,15 +31,23 @@
         };
 
         this.hallSeats = [];
-
         this.config = Object.assign(this.defaultConfig, config);
 
+        this.initFabric();
+    }
+
+    /**
+     * Init fabric js.
+     *
+     * @return void
+     */
+    SectorCanvasEditor.prototype.initFabric = function() {
         this.fabricCanvas = new fabric.Canvas(this.canvas, {
             width: this.config.canvasWidth,
             height: this.config.canvasHeight,
             backgroundColor: this.config.canvasBackgroundColor
         });
-    }
+    };
 
     /**
      * Add seat to the row using color (hex) and row number
@@ -93,6 +101,11 @@
         }
 
         this.renderAll();
+    };
+
+    SectorCanvasEditor.prototype.clearCanvas = function() {
+        this.fabricCanvas.clear();
+        this.initFabric();
     };
 
     /**

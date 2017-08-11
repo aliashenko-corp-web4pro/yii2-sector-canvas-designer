@@ -2,6 +2,7 @@
 
 namespace andrewljashenko\sectorcanvaseditor;
 
+use Yii;
 use yii\base\Model;
 
 /**
@@ -10,6 +11,10 @@ use yii\base\Model;
  */
 class SectorCanvasForm extends Model
 {
+    /**
+     * @var string
+     */
+    public $seatColor = '#02c103';
     /**
      * @var int
      */
@@ -26,6 +31,10 @@ class SectorCanvasForm extends Model
      * @var int
      */
     public $numberSeatsFrom = 1;
+    /**
+     * @var int
+     */
+    public $numberRows = 1;
     /**
      * @var string
      */
@@ -54,12 +63,58 @@ class SectorCanvasForm extends Model
      * @var
      */
     public $numSeatsPerRow = 5;
+    /**
+     * @var
+     */
+    public $drawingStyle = 'Pencil';
+    /**
+     * @var string
+     */
+    public $lineWidth = 0;
+    /**
+     * @var string
+     */
+    public $drawingColor;
+    /**
+     * @var string
+     */
+    public $lineColor;
 
     /**
      * @return array
      */
-    public function getSeatColors()
+    public static function getSeatColors()
     {
         return ['#02c103', '#fbeb00', '#c98b02', '#c53c00', '#848285'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'numberRows' => Yii::t('app', 'Number of Rows'),
+            'numberSeatsFrom' => Yii::t('app', 'First number')
+        ];
+    }
+
+    /**
+     * Return list of drawing modes.
+     *
+     * @return array
+     */
+    public static function getDrawingModeSelector()
+    {
+        return [
+            'Pencil' => Yii::t('app', 'Pencil'),
+            'Circle' => Yii::t('app', 'Circle'),
+            'Spray' => Yii::t('app', 'Spray'),
+            'Pattern' => Yii::t('app', 'Pattern'),
+            'hline' => Yii::t('app', 'hline'),
+            'vline' => Yii::t('app', 'vline'),
+            'square' => Yii::t('app', 'square'),
+            'diamond' => Yii::t('app', 'diamond'),
+        ];
     }
 }
