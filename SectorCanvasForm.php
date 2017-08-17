@@ -79,6 +79,10 @@ class SectorCanvasForm extends Model
      * @var string
      */
     public $lineColor;
+    /**
+     * @var string
+     */
+    public $seatType;
 
     /**
      * @return array
@@ -89,13 +93,28 @@ class SectorCanvasForm extends Model
     }
 
     /**
+     * @return array
+     */
+    public function getSeatTypes()
+    {
+        return [
+            [
+                'description' => Yii::t('app', 'big 30x30'),
+                'width' => 30,
+                'height' => 30,
+            ]
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
         return [
             'numberRows' => Yii::t('app', 'Number of Rows'),
-            'numberSeatsFrom' => Yii::t('app', 'First number')
+            'numberSeatsFrom' => Yii::t('app', 'First number'),
+            'seatColor' => Yii::t('app', 'Seat status'),
         ];
     }
 

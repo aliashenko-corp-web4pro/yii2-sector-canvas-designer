@@ -9,6 +9,18 @@
 
         fabric.Object.prototype.transparentCorners = false;
 
+        $('.sector-canvas-wrap').closest('form').on('submit', function() {
+            var id = $(this).find(' .js-sector-canvas').attr('id');
+            var instance = sectorCanvasInstances[id];
+            $(this).find('.js-sector-seats-json').val(JSON.stringify(instance.toJSON()));
+
+            console.log(instance.config)
+
+            $('.js-canvas-data', $(this).find('.sector-canvas-wrap')).val(JSON.stringify(instance.config));
+
+            return true;
+        });
+
         $(document).on('change', '.js-color-seat', function() {
             var id = $(this).closest('.sector-canvas-wrap').find('.js-sector-canvas').attr('id');
             var color = $(this).val();
@@ -19,11 +31,36 @@
                     c.getActiveGroup().forEachObject(function(o){
                         var objects = o.getObjects();
                         objects[0].set('fill', color);
+
+                        objects[0].group.my.config.type = sectorCanvasInstances[id].getTypeByColor(color);
+                        objects[0].group.my.config.color = color;
                     });
                     // c.discardActiveGroup().renderAll();
                 } else {
                     var objects = c.getActiveObject().getObjects();
                     objects[0].set('fill', color);
+
+                    objects[0].group.my.config.type = sectorCanvasInstances[id].getTypeByColor(color);
+                    objects[0].group.my.config.color = color;
+                }
+            }
+        });
+
+        $(document).on('change', '.js-seat-type', function() {
+            var id = $(this).closest('.sector-canvas-wrap').find('.js-sector-canvas').attr('id');
+            var type = $(this).val();
+
+            if (id) {
+                var c = sectorCanvasInstances[id].fabricCanvas;
+                if(c.getActiveGroup()){
+                    c.getActiveGroup().forEachObject(function(o){
+                        var objects = o.getObjects();
+                        sectorCanvasInstances[id].changeSeatType(objects[0], type);
+                    });
+                    // c.discardActiveGroup().renderAll();
+                } else {
+                    var objects = c.getActiveObject().getObjects();
+                    sectorCanvasInstances[id].changeSeatType(objects[0], type);
                 }
             }
         });
@@ -56,9 +93,22 @@
                     canvasID = $el.attr('id'),
                     actionBtn = $('.sector-canvas-wrap [data-action]');
 
-                sectorCanvasInstances[canvasID] = new SectorCanvasEditor($el.get(0), config ? JSON.parse(config) : {});
+                var val = $(this).closest('.sector-canvas-wrap').find('.js-canvas-data').val();
+
+                var savedConfig = val ? JSON.parse(val) : null;
+                config = savedConfig ? savedConfig : config;
+
+                sectorCanvasInstances[canvasID] = new SectorCanvasEditor($el.get(0), config);
 
                 var instance = sectorCanvasInstances[canvasID].fabricCanvas;
+                var data = $(this).closest('.sector-canvas-wrap').find('.js-canvas-data').val();
+
+                sectorCanvasInstances[canvasID].renderAll();
+                // instance.loadFromJSON(JSON.parse(data), function() {
+                //     instance.renderAll();
+                // })
+
+                window.sectorCanvasInstances = sectorCanvasInstances;
 
                 if (fabric.PatternBrush) {
                     var vLinePatternBrush = new fabric.PatternBrush(instance);
@@ -192,14 +242,18 @@
 
                     switch(action) {
                         case 'add-row':
-                            var seatsNum = $form.find('#sectorcanvasform-numseatsperrow').val();
-                            var rowsNum = $form.find('#sectorcanvasform-numberrows').val();
-                            var fromNumber = $form.find('#sectorcanvasform-numberseatsfrom').val();
+                            var seatsNum = $form.find('.js-seats-num-per-row').val();
+                            var rowsNum = $form.find('.js-row-num').val();
+                            var fromNumber = $form.find('.js-start-num').val();
+                            var seatType = $form.find('.js-seat-type').val();
 
                             if (!seatsNumberAlreadySet) {
                                 instance.config.numberSeatsFrom = fromNumber;
                                 seatsNumberAlreadySet = !seatsNumberAlreadySet;
                             }
+
+                            instance.config.seatType = seatType ? seatType : 0;
+                            console.dir(instance.config.seatType)
 
                             for (var i = 0; i < rowsNum; i++) {
                                 instance.addRow(seatsNum);

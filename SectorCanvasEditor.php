@@ -13,7 +13,7 @@ use yii\widgets\InputWidget;
  */
 class SectorCanvasEditor extends InputWidget
 {
-    public $template = '<div class="row sector-canvas-wrap">
+    public $template = '<div class="row sector-canvas-wrap">{field}
                             <div class="col-md-7">{canvas}</div>
                             <div class="col-md-5">{ui}</div>
                         </div>';
@@ -44,6 +44,13 @@ class SectorCanvasEditor extends InputWidget
      */
     public function init()
     {
+        if (empty($this->pluginOptions['seatColors'])) {
+            $this->pluginOptions['seatColors'] = SectorCanvasForm::getSeatColors();
+        }
+
+        if (empty($this->pluginOptions['seatTypes'])) {
+            $this->pluginOptions['seatTypes'] = SectorCanvasForm::getSeatTypes();
+        }
         parent::init();
     }
 
@@ -101,6 +108,42 @@ class SectorCanvasEditor extends InputWidget
      */
     protected function renderContent()
     {
-        return str_replace(['{canvas}', '{ui}'], [$this->getCanvas(), $this->getUI()], $this->template);
+        return str_replace(['{field}', '{canvas}', '{ui}'], [$this->getInput('hiddenInput'), $this->getCanvas(), $this->getUI()], $this->template);
+    }
+
+    /**
+     * Generates an input.
+     *
+     * @param string $type the input type
+     * @param boolean $list whether the input is of dropdown list type
+     *
+     * @return string the rendered input markup
+     */
+    protected function getInput($type, $list = false)
+    {
+        $this->options['class'] = 'js-canvas-data';
+
+        if ($this->hasModel()) {
+            $input = 'active' . ucfirst($type);
+            return $list ?
+                Html::$input($this->model, $this->attribute, $this->data, $this->options) :
+                Html::$input($this->model, $this->attribute, $this->options);
+        }
+        $input = $type;
+        $checked = false;
+        if ($type == 'radio' || $type == 'checkbox') {
+            $this->options['value'] = $this->value;
+            $checked = ArrayHelper::remove($this->options, 'checked', '');
+            if (empty($checked) && !empty($this->value)) {
+                $checked = ($this->value == 0) ? false : true;
+            } elseif (empty($checked)) {
+                $checked = false;
+            }
+        }
+        return $list ?
+            Html::$input($this->name, $this->value, $this->data, $this->options) :
+            (($type == 'checkbox' || $type == 'radio') ?
+                Html::$input($this->name, $checked, $this->options) :
+                Html::$input($this->name, $this->value, $this->options));
     }
 }

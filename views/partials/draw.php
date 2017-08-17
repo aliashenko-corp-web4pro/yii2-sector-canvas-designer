@@ -30,7 +30,7 @@ use andrewljashenko\sectorcanvaseditor\SectorCanvasForm; ?>
         ]) ?>
 
         <?= $form->field($model, 'drawingColor')->input('color', [
-            'class' => 'js-drawing-color'
+            'class' => 'js-drawing-color',
         ]) ?>
     </div>
 </div>
