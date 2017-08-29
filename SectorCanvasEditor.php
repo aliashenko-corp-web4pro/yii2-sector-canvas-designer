@@ -42,21 +42,6 @@ class SectorCanvasEditor extends InputWidget
     /**
      * @inheritdoc
      */
-    public function init()
-    {
-        if (empty($this->pluginOptions['seatColors'])) {
-            $this->pluginOptions['seatColors'] = SectorCanvasForm::getSeatColors();
-        }
-
-        if (empty($this->pluginOptions['seatTypes'])) {
-            $this->pluginOptions['seatTypes'] = SectorCanvasForm::getSeatTypes();
-        }
-        parent::init();
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function run()
     {
         SectorCanvasEditorAsset::register(Yii::$app->view);

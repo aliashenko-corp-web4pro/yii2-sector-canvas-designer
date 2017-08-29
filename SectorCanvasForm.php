@@ -83,6 +83,22 @@ class SectorCanvasForm extends Model
      * @var string
      */
     public $seatType;
+    /**
+     * @var
+     */
+    public $seatStatus;
+    /**
+     * @var string
+     */
+    public $vocabulary = 'app';
+    /**
+     * @var string
+     */
+    public $fontType = 'arial';
+    /**
+     * @var string
+     */
+    public $file;
 
     /**
      * @return array
@@ -134,6 +150,31 @@ class SectorCanvasForm extends Model
             'vline' => Yii::t('app', 'vline'),
             'square' => Yii::t('app', 'square'),
             'diamond' => Yii::t('app', 'diamond'),
+        ];
+    }
+
+    /**
+     * Return list of fonts.
+     *
+     * @return array
+     */
+    public function getFonts()
+    {
+        return [
+            "arial" => Yii::t( $this->vocabulary, "Arial"),
+            "helvetica" => Yii::t( $this->vocabulary, "Helvetica"),
+            "myriad pro" => Yii::t( $this->vocabulary, "Myriad Pro"),
+            "delicious" => Yii::t( $this->vocabulary, "Delicious"),
+            "verdana" => Yii::t( $this->vocabulary, "Verdana"),
+            "georgia" => Yii::t( $this->vocabulary, "Georgia"),
+            "courier" => Yii::t( $this->vocabulary, "Courier"),
+            "comic sans ms" => Yii::t( $this->vocabulary, "Comic Sans MS"),
+            "impact" => Yii::t( $this->vocabulary, "Impact"),
+            "monaco" => Yii::t( $this->vocabulary, "Monaco"),
+            "optima" => Yii::t( $this->vocabulary, "Optima"),
+            "hoefler text" => Yii::t( $this->vocabulary, "Hoefler Text"),
+            "plaster" => Yii::t( $this->vocabulary, "Plaster"),
+            "engagement" => Yii::t( $this->vocabulary, "Engagement"),
         ];
     }
 }
