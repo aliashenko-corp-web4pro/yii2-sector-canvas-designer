@@ -29,17 +29,20 @@
             ],
             seatType: 0,
             seatDefaultColor: '#02c103',
-            seatMarginTop: 5,
+            seatMarginTop: 30,
             seatMarginLeft: 5,
             fontSize: 14,
             fontFamily: 'Helvetica',
             fontColor: '#000',
             hallSeats: [],
+            temp: [],
+            objects: [],
         };
-        
-        this.config = Object.assign(this.defaultConfig, config);
 
+        this.config = Object.assign(this.defaultConfig, config);
+        this.config.seatMarginTop = 30;
         this.initFabric();
+        this.initTemp();
     }
 
     /**
@@ -49,11 +52,11 @@
      * @param seatType
      */
     SectorCanvasEditor.prototype.changeSeatType = function(object, seatType) {
-        if (typeof object.group.key !=' undefined') {
+        if (typeof object.group.seatConfig !=' undefined') {
             var type = this.config.seatTypes[seatType];
             object.set('width', parseFloat(type.width));
             object.set('height', parseFloat(type.width));
-            this.config.hallSeats[object.group.key].seat_type_id = seatType;
+            object.group.seatConfig.seat_type_id = seatType;
         }
     }
 
@@ -64,11 +67,71 @@
      * @param seatType
      */
     SectorCanvasEditor.prototype.changeSeatStatus = function(object, seatStatus) {
-        if (typeof object.group.key !=' undefined') {
+        if (typeof object.group.seatConfig !=' undefined') {
             var status = this.config.seatStatuses[seatStatus];
             object.set('fill', status.color_back);
-            this.config.hallSeats[object.group.key].seat_status_id = seatStatus;
+            object.group.seatConfig.seat_status_id = seatStatus;
         }
+    }
+
+    /**
+     * Initialize temp objects.
+     *
+     * @return void
+     */
+    SectorCanvasEditor.prototype.initTemp = function () {
+        var _this = this;
+
+        console.log(this.config)
+
+        for (var i in this.config.hallSeats) {
+            var seatConfig = this.config.hallSeats[i];
+            var searched = false;
+            var group = this.generateSeat(seatConfig).toJSON();
+            group.seatConfig = seatConfig;
+
+            for (var j in this.config.objects) {
+                var object = this.config.objects[j];
+
+                if (typeof object.seatConfig == 'undefined') continue;
+
+                if (seatConfig.id == object.seatConfig.id) {
+                    this.config.objects[j] = group;
+                    searched = true;
+                    break;
+                }
+            }
+
+            if (!searched) {
+                this.config.objects.push(group);
+            }
+        }
+
+        for (var i in this.config.objects) {
+            var object = this.config.objects[i];
+            var searched = false;
+
+            if (typeof object.seatConfig == 'undefined') continue;
+
+            for (var j in this.config.hallSeats) {
+                var seatConfig = this.config.hallSeats[j];
+
+                if (seatConfig.id == this.config.objects[i].seatConfig.id) {
+                    searched = true;
+                    break;
+                }
+            }
+
+            if (!searched) {
+                this.config.objects.splice(i, 1);
+            }
+        }
+
+        if (this.config.objects) {
+            this.fabricCanvas.loadFromJSON(JSON.stringify(this.config), this.fabricCanvas.renderAll.bind(this.fabricCanvas));
+        }
+
+
     }
 
     /**
@@ -91,24 +154,25 @@
      */
     SectorCanvasEditor.prototype.addSeat = function(config) {
         this.config.hallSeats.push(config);
+        this.renderSeat(config);
     };
 
     SectorCanvasEditor.prototype.setCanvasWidth = function(width) {
         this.fabricCanvas.setWidth(width);
         this.config.canvasWidth = width;
-        this.renderAll();
+        this.fabricCanvas.renderAll();
     };
 
     SectorCanvasEditor.prototype.setCanvasHeight = function(height) {
         this.fabricCanvas.setHeight(height);
         this.config.canvasHeight = height;
-        this.renderAll();
+        this.fabricCanvas.renderAll();
     };
 
     SectorCanvasEditor.prototype.setCanvasBackgroundColor = function(color) {
         this.fabricCanvas.setBackgroundColor(color);
         this.config.canvasBackgroundColor = color;
-        this.renderAll();
+        this.fabricCanvas.renderAll();
     };
 
     SectorCanvasEditor.prototype.getTypeByColor = function(color) {
@@ -119,6 +183,34 @@
         return null;
     }
 
+    SectorCanvasEditor.prototype.getMaxPositionTop = function () {
+        var max = 0;
+        if (this.config.hallSeats.length) {
+            for (var i in this.config.hallSeats) {
+                if (typeof this.config.hallSeats[i].position_top != 'undefined') {
+                    var positionTop = parseFloat(this.config.hallSeats[i].position_top);
+                    max = max < positionTop ? positionTop : max;
+                }
+            }
+        }
+
+        return max;
+    }
+
+    SectorCanvasEditor.prototype.getMaxPositionNum = function () {
+        var max = 0;
+        if (this.config.hallSeats.length) {
+            for (var i in this.config.hallSeats) {
+                if (typeof this.config.hallSeats[i].position_in_sector != 'undefined') {
+                    var positionTop = parseFloat(this.config.hallSeats[i].position_in_sector);
+                    max = max < positionTop ? positionTop : max;
+                }
+            }
+        }
+
+        return max;
+    }
+
     /**
      * Add new row with seats.
      *
@@ -127,28 +219,72 @@
      */
     SectorCanvasEditor.prototype.addRow = function(numberOfSeats, seatStatus, seatType) {
         var length = this.config.hallSeats.length;
-        var seatPositionY = this.config.hallSeats.length  * (parseFloat(this.config.seatTypes[seatType].height) + this.config.seatMarginTop);
+        var seatPositionY = this.getMaxPositionTop() + this.config.seatMarginTop;
 
         this.config.hallSeats[this.config.hallSeats.length] = [];
 
         for (var i = 0; i < numberOfSeats; i++) {
             var seatPositionX = i * (parseFloat(this.config.seatTypes[seatType].width) + this.config.seatMarginLeft);
+            var posNum = this.getMaxPositionNum();
             this.addSeat({
                 position_left: seatPositionX,
                 position_top: seatPositionY,
                 seat_type_id: seatType,
                 seat_status_id: seatStatus,
-                position_in_sector: this.config.numberSeatsFrom++
+                position_in_sector: ++posNum,
+                key: length + i,
             });
         }
-
-        this.renderAll();
     };
 
     SectorCanvasEditor.prototype.clearCanvas = function() {
         this.fabricCanvas.clear();
         this.initFabric();
     };
+
+    SectorCanvasEditor.prototype.generateSeat = function(seatConfig) {
+        var seat = new fabric.Rect({
+            width: parseFloat(this.config.seatTypes[seatConfig.seat_type_id].width),
+            height: parseFloat(this.config.seatTypes[seatConfig.seat_type_id].height),
+            fill: this.config.seatStatuses[seatConfig.seat_status_id].color_back,
+            originX: 'center',
+            originY: 'center'
+        });
+
+        var t1 = new fabric.Text(String(seatConfig.position_in_sector), {
+            fill: this.config.fontColor,
+            fontFamily: this.config.fontFamily,
+            textAlign: 'center',
+            fontSize: this.config.fontSize,
+            originX: 'center',
+            originY: 'center'
+        });
+
+        var group = new fabric.Group([seat, t1], {
+            left: parseFloat(seatConfig.position_left),
+            top: parseFloat(seatConfig.position_top)
+        });
+
+        group.key = seatConfig.key;
+        group.seatConfig = seatConfig;
+
+        return group;
+    };
+
+    /**
+     *
+     * @param seatConfig
+     */
+    SectorCanvasEditor.prototype.renderSeat = function(seatConfig) {
+        if (typeof seatConfig.seat_type_id == 'undefined') return;
+
+        var _this = this;
+
+        var group = this.generateSeat(seatConfig);
+
+        this.fabricCanvas.add(group);
+
+    }
 
     /**
      * Render canvas elements.
@@ -160,44 +296,49 @@
             var objects = this.fabricCanvas.getObjects();
 
             for (var i in objects) {
-                this.fabricCanvas.remove(objects[i]);
+                if (typeof objects[i].key != 'undefined') {
+                    this.fabricCanvas.remove(objects[i]);
+                }
             }
 
             for (var i in this.config.hallSeats) {
                 var seatConfig = this.config.hallSeats[i];
+                seatConfig.key = i;
 
-                if (typeof seatConfig.seat_type_id == 'undefined') continue;
+                this.renderSeat(seatConfig);
 
-                var seat = new fabric.Rect({
-                    width: parseFloat(this.config.seatTypes[seatConfig.seat_type_id].width),
-                    height: parseFloat(this.config.seatTypes[seatConfig.seat_type_id].height),
-                    fill: this.config.seatStatuses[seatConfig.seat_status_id].color_back,
-                    originX: 'center',
-                    originY: 'center'
-                });
-
-                var t1 = new fabric.Text(String(seatConfig.position_in_sector), {
-                    fill: this.config.fontColor,
-                    fontFamily: this.config.fontFamily,
-                    textAlign: 'center',
-                    fontSize: this.config.fontSize,
-                    originX: 'center',
-                    originY: 'center'
-                });
-
-                var group = new fabric.Group([seat, t1], {
-                    left: parseFloat(seatConfig.position_left),
-                    top: parseFloat(seatConfig.position_top)
-                });
-
-                group.key = i;
-
-                this.fabricCanvas.add(group);
                 this.fabricCanvas.renderAll();
             }
         }
     };
 
+    /**
+     * Generatation of submit data.
+     * 
+     * @returns {*}
+     */
+    SectorCanvasEditor.prototype.generateSubmitData = function () {
+        var objects = this.fabricCanvas.getObjects();
+        this.config.objects = [];
+
+        if (objects) {
+            for (var i in objects) {
+                var jsonObject = objects[i].toJSON();
+
+                if (typeof objects[i].seatConfig != 'undefined') {
+                    jsonObject.seatConfig = objects[i].seatConfig;
+                    jsonObject.key = objects[i].key;
+                }
+
+                this.config.objects.push(jsonObject);
+            }
+        }
+
+        console.log(this.config.objects)
+
+        return this.config;
+    }
+    
     /**
      *
      * @param row
@@ -209,23 +350,6 @@
             left: (this.config.canvasWidth - (this.config.hallSeats[row].length * (parseFloat(this.config.seatTypes[this.config.seatType].width) + this.config.seatMarginLeft))) / 2
         };
     };
-
-    SectorCanvasEditor.prototype.toJSON = function(row) {
-        var objects = this.fabricCanvas.getObjects();
-        var data = [];
-
-        if (objects.length) {
-            for (var i in objects) {
-                var o = objects[i];
-
-                if (typeof o.my != 'undefined') {
-                    data.push(o.my);
-                }
-            }
-        }
-
-        return data;
-    }
 
     window.SectorCanvasEditor = SectorCanvasEditor;
 })();

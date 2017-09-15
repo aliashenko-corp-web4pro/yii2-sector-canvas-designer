@@ -30,8 +30,29 @@ use andrewljashenko\sectorcanvaseditor\SectorCanvasForm; ?>
 
 <div class="js-manage-text--wrap" style="display: none">
     <?= $form->field($model, 'fontSize')->input('number', ['min' => 0, 'class' => 'form-control js-fontSize']) ?>
-    <?= $form->field($model, 'fontSize')->input('color', ['class' => 'form-control js-fontColor']) ?>
+    <?= $form->field($model, 'fontColor')->input('color', ['class' => 'form-control js-fontColor']) ?>
     <?= $form->field($model, 'fontType')->dropDownList($model->getFonts(), ['class' => 'form-control js-fontType']) ?>
+</div>
+
+<div class="js-manage-bg--wrap" style="display: none;">
+    <div style="margin-top:10px;">
+        <button id="send-backwards" class="btn btn-object-action" type="button" data-action="send-backwards">
+            <?= Yii::t('app', 'Send backwards') ?>
+        </button>
+
+        <button id="send-to-back" class="btn btn-object-action" data-action="send-back" type="button">
+            <?= Yii::t('app', 'Send to back') ?>
+        </button>
+    </div>
+
+    <div style="margin-top:4px;">
+        <button id="bring-forward" class="btn btn-object-action" type="button" data-action="bring-forwards">
+            <?= Yii::t('app', 'Bring forwards') ?>
+        </button>
+        <button id="bring-to-front" class="btn btn-object-action" type="button" data-action="bring-front">
+            <?= Yii::t('app', 'Bring to front') ?>
+        </button>
+    </div>
 </div>
 
 <div class="js-canvas-drawing" style="display: none;">

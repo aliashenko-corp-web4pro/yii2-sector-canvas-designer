@@ -12,11 +12,11 @@
         $('.sector-canvas-wrap').closest('form').on('submit', function() {
             var id = $(this).find(' .js-sector-canvas').attr('id');
             var instance = sectorCanvasInstances[id];
-            $(this).find('.js-sector-seats-json').val(JSON.stringify(instance.toJSON()));
 
-            $('.js-canvas-data', $(this).find('.sector-canvas-wrap')).val(JSON.stringify(instance.config));
+            $('.js-canvas-data', $(this).find('.sector-canvas-wrap')).val(JSON.stringify(instance.generateSubmitData()));
 
             return true;
+            // return false;
         });
 
         $(document).on('change', '.js-color-seat', function() {
@@ -135,13 +135,24 @@
                 var instance = sectorCanvasInstances[canvasID].fabricCanvas;
                 var data = $(this).closest('.sector-canvas-wrap').find('.js-canvas-data').val();
 
-                sectorCanvasInstances[canvasID].renderAll();
+                // sectorCanvasInstances[canvasID].renderAll();
 
                 instance.on({
                     'object:moving': function(e) {
+                        console.log(e.target.type)
+
                         if (typeof e.target.key != 'undefined') {
+                            console.log(e.target.key)
                             sectorCanvasInstances[canvasID].config.hallSeats[e.target.key].position_left = e.target.left;
                             sectorCanvasInstances[canvasID].config.hallSeats[e.target.key].position_top = e.target.top;
+                        } else if (typeof e.target.type == 'group') {
+                            var objects = e.target.getObjects() || [];
+
+                            for (var i in objects) {
+                                if (typeof objects[i].key != undefined)
+                                sectorCanvasInstances[canvasID].config.hallSeats[objects[i].key].position_left = e.target.left;
+                                sectorCanvasInstances[canvasID].config.hallSeats[objects[i].key].position_top = e.target.top;
+                            }
                         }
                     }
                 })
@@ -268,6 +279,8 @@
                                 var instance = sectorCanvasInstances[canvasID];
                                 var c = instance.fabricCanvas;
                                 c.add(oImg);
+
+                                console.log('add image')
                             });
                         };
                         reader.readAsDataURL(file);
@@ -319,6 +332,8 @@
                         } else {
                             $('.js-manage-text--wrap').hide();
                         }
+
+                        $('.js-manage-bg--wrap').show();
                     })
                     .on('group:selected', function(e) {
                         $('.js-delete-objects, .js-manage-seats--wrap').show();
@@ -326,12 +341,14 @@
                     .on('selection:cleared', function(e) {
                         $('.js-delete-objects, .js-manage-seats--wrap').hide();
                         $('.js-delete-objects, .js-manage-text--wrap').hide();
+                        $('.js-manage-bg--wrap').hide();
                     });
 
                 actionBtn.click(function() {
                     var canvasID = $(this).closest('.sector-canvas-wrap').find('.js-sector-canvas').attr('id');
                     var instance = sectorCanvasInstances[canvasID];
                     var action = $(this).data('action');
+                    var fabricCanvas = instance.fabricCanvas;
 
                     var $form = $(this).closest('form');
 
@@ -389,6 +406,30 @@
                                 fill: '#333',
                                 fontSize: 14
                             }));
+                            break;
+
+                        case 'send-backwards':
+                            var obj = fabricCanvas.getActiveObject();
+                            if (obj) fabricCanvas.sendBackwards(obj);
+
+                            break;
+
+                        case 'send-back':
+                            var obj = fabricCanvas.getActiveObject();
+                            if (obj) fabricCanvas.sendToBack(obj);
+
+                            break;
+
+                        case 'bring-forwards':
+                            var obj = fabricCanvas.getActiveObject();
+                            if (obj) fabricCanvas.bringForward(obj);
+
+                            break;
+
+                        case 'bring-front':
+                            var obj = fabricCanvas.getActiveObject();
+                            if (obj) fabricCanvas.bringToFront(obj);
+
                             break;
                     }
                 });
